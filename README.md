@@ -2,7 +2,7 @@
 
 ## Disclaimer
 
-Although forked from the original repo, this repo is not owned, developed or maintained by any of its former contributors. If you are really that curious of its maintainer(s), this repo may not belong to a student of Tongji University, or a Chinese, or even a Terran. Who knows? It might even turn out that you are the one who actually wrote these codes when you are sleepwalking.
+Although forked from the original repo, this repo is not owned, developed or maintained by any of its former contributors. If you are really that curious of its maintainer(s), this repo may not belong to a student of Tongji University, or a Chinese, or even a Terran. Who knows? It might even turn out that you are the one who actually wrote these codes when you were sleepwalking.
 
 ## Usage & Installation Guide
 
