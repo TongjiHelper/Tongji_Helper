@@ -68,14 +68,10 @@ chrome.webRequest.onCompleted.addListener(
   },
   {urls: ["*://1.tongji.edu.cn/api/studentservice/studentInfo/findUserInfoByIdType*"]});
 
-chrome.runtime.onStartup.addListener(checkstatus);
-chrome.runtime.onInstalled.addListener(checkstatus);
-
 let sh,sh1,c,c1,sup={},round=0,supstatus='f',supfailmsg={},lastelect=0;
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.target!='bg') return;
-  if (request.action=='checkstatus') checkstatus();
   if (request.action=='electSucceed') {
     c=request.c;
     doc();
@@ -88,7 +84,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   }
   if (request.action=='setRoomSucceed') {
     chrome.storage.local.set({elec_lastcheck:0});
-    checkstatus();
     chrome.notifications.create('setRoomSucceed',{'type':'basic','iconUrl':'img/icon48.png','title':'房间号设置成功','message':'房间号已设置为'+request.room});
   }
   if (request.sh!=null) {

@@ -17,7 +17,7 @@
  * Copyright (C) 2021 TongjiHelper
  */
 
-chrome.storage.local.get(['username','password','enable','interval','showReserver','status','elec_enable','elec_threshold','room'],function (items) {
+chrome.storage.local.get(['username','password','enable','interval','showReserver','elec_enable','elec_threshold','room'],function (items) {
   $('#username').val(items['username']);
   $('#password').val(items['password']);
   $('#interval').val(items['interval']);
@@ -37,8 +37,7 @@ $('#setroom').click(function () {
 });
 
 function save () {
-  chrome.storage.local.set({'username':$('#username').val(),'password':$('#password').val(),'interval':parseInt($('#interval').val()),'showReserver':$('#showReserver').prop('checked'),'elec_enable':$('#elec_enable').prop('checked'),'elec_threshold':$('#elec_threshold').val(),'course_update_enable':$('#course_update_enable').val(),'enable':true,'status':'toconnect'},function() {
-    chrome.runtime.sendMessage({'target':'bg','action':'checkstatus'});
+  chrome.storage.local.set({'username':$('#username').val(),'password':$('#password').val(),'interval':parseInt($('#interval').val()),'showReserver':$('#showReserver').prop('checked'),'elec_enable':$('#elec_enable').prop('checked'),'elec_threshold':$('#elec_threshold').val(),'course_update_enable':$('#course_update_enable').val(),'enable':true},function() {
     $('#tip').html('保存成功~').fadeIn().delay(2000).fadeOut();
   });
 }

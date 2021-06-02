@@ -51,20 +51,11 @@ let v=new Vue({
     }
   }
 });
-chrome.storage.local.get(['enable','status','msg','msg_content','mail','electsuping'],function (items) {
+chrome.storage.local.get(['enable','msg','msg_content','mail','electsuping'],function (items) {
   $('#enable').prop("checked", items['enable']==true?true:false);
-  if (items['status']!='allow') {
-    switch (items['status']) {
-      case 'toconnect': lock('正在初始化…',true);return;
-      case 'toupdate': lock(items['msg_content'],false);break;
-      case 'toset': lock(items['msg_content']);
-    }
-    if ($('#enable').prop('checked')) $('#enable').click();
-  }
   if (items['msg']!='0') $('#alert-'+items['msg']).html(items['msg_content']).show();
   v.mails=items['mail'];
   $('[data-url]').click(function(){chrome.tabs.create({url:$(this).data('url')});});
-  $('#checkscore').click(function(){chrome.storage.local.set({checkscore:1});});
   if (items['electsuping']) {$('#electsuptip').show();}
 });
 

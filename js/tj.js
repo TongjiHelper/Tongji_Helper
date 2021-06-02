@@ -18,7 +18,7 @@
  */
 
 let teachers;
-chrome.storage.local.get(['username','password','enable','interval','status','mail','mail_index','checkscore','setroom'],async function (items) {
+chrome.storage.local.get(['username','password','enable','interval','mail','mail_index','setroom'],async function (items) {
   if (!items['enable']) return;
   if (window.location.host.indexOf("192.168.192")==0 && $("title").html()=="同济大学上网认证系统") {
     $('#loginname').val(items['username']==null?"":items['username']).hide();
@@ -28,8 +28,6 @@ chrome.storage.local.get(['username','password','enable','interval','status','ma
       $('div[class="login-botton"]').html('Tongji Helper 正在为您自动登录…');
     },500);
   }
-
-  if (items['status']!='allow') return;
 
   let isPwdFailed = $('#error').text().includes("密码错误");
   if (window.location.host=="ids.tongji.edu.cn:8443" && !isPwdFailed && await getStorage('enable_ids',true)) { //统一身份认证
@@ -99,11 +97,6 @@ chrome.storage.local.get(['username','password','enable','interval','status','ma
     if (window.location.href.indexOf("loginTree.jsp")>0) {
       $('#navSubMenu_').hide();
       $('font[size="-1"]').hide();
-      setTimeout(function(){
-        if (items['checkscore']==1) {
-          myeval("open11('01','/tj_xuankexjgl/score/query/student/cjcx.jsp?qxid=20051013779916&mkid=20051013779901','20051013779916','null','null');");
-        }
-      },800);
     }
 
     if (window.location.href.indexOf("xspj.jsp")>0) {
@@ -122,12 +115,6 @@ chrome.storage.local.get(['username','password','enable','interval','status','ma
       $('#yj5').click(function (){$('#yj').html($('#yj5').html());$('input[type=radio][value=E]').prop('checked',true);});
       $('input[type=radio][value=A]').prop('checked',true);
     }
-
-    if (window.location.href.indexOf('cjcx.jsp')>0 && items['checkscore']==1) {
-      $('body').stop().animate({scrollTop: $(window).height()},800);
-      chrome.storage.local.set({checkscore:0});
-    }
-
   }
 
   if (window.location.host=="4m3.tongji.edu.cn") {
@@ -240,10 +227,10 @@ chrome.storage.local.get(['username','password','enable','interval','status','ma
 });
 
 chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
-  if (request.target!='cs' || await getStorage('enable',false)!=true || await getStorage('status')!='allow') return;
+  if (request.target!='cs' || await getStorage('enable',false)!=true) return;
   if (request.action=='addReserverName') {
-    chrome.storage.local.get(['enable','status','showReserver'],function (items) {
-      if (!items['enable'] || items['status']!='allow' || !items['showReserver']) return;
+    chrome.storage.local.get(['enable','showReserver'],function (items) {
+      if (!items['enable'] || !items['showReserver']) return;
       $.ajax({url:request.url+'&c=1',timeout:3000,success:function (res) {
         $('div.cld-occupy').css('font-size','15px');
         res=JSON.parse(res).data;
