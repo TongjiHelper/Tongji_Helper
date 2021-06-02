@@ -229,7 +229,7 @@ function onElectError(xhr,func){
   if (xhr.readyState==0) {
     supstatus='w';
     supfailmsg={'网络连接出错，请检查网络连接':'将在稍后重试。'};
-    chrome.storage.local.get(['interval'],function (items) {
+    chrome.storage.local.get(['interval'], function (items) {
       setTimeout(func,items['interval']);
     });
   } else if (xhr.status==400 && xhr.responseText=='{"message":"选课轮次不存在"}') {

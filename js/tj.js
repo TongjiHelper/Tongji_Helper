@@ -17,74 +17,67 @@
  * Copyright (C) 2021 TongjiHelper
  */
 
-let teachers;
-chrome.storage.local.get(['username','password','enable','interval','mail','mail_index','setroom'],async function (items) {
-  if (!items['enable']) return;
+const autoLoggingNotice = 'Tongji Helper 正在为您自动登录...'
+
+chrome.storage.local.get(['username','password','enable','interval','mail','mail_index','setroom'], async function (items) {
+  if (!items['enable']) {
+    return;
+  }
+
   if (window.location.host.indexOf("192.168.192")==0 && $("title").html()=="同济大学上网认证系统") {
     $('#loginname').val(items['username']==null?"":items['username']).hide();
     $('#password').val(items['password']==null?"":items['password']).hide();
     setTimeout(function(){
       $('input[alt="Submit"]').click();
-      $('div[class="login-botton"]').html('Tongji Helper 正在为您自动登录…');
+      $('div[class="login-botton"]').html(autoLoggingNotice);
     },500);
   }
 
-  let isPwdFailed = $('#error').text().includes("密码错误");
-  if (window.location.host=="ids.tongji.edu.cn:8443" && !isPwdFailed && await getStorage('enable_ids',true)) { //统一身份认证
-    $('#username').val(items['username'] == null ? "" : items['username']);
-    $('#password').val(items['password'] == null ? "" : items['password']);
-    let $codeImg = $('#codeImg');
-    $('[name=btsubmit]').val('Tongji Helper 正在为您自动登录…')
-    if ($codeImg.length) setTimeout(async () => {
-      let attr = $codeImg.attr("src");
-      // 设置了一个最大尝试次数，避免网络原因导致验证码完全加载不出来的情况
-      const attemptCount = 10;
-      for (let i = 0; i < attemptCount; i++) {
-        attr = $codeImg.attr("src");
-        if (!(attr === undefined || attr === "#")) {
-          break;
-        }
-        if (i==attemptCount-1) window.location.reload();
-        await sleep(1000);
-      }
-      processAndPredict(attr).then(v => {
-        $('#Txtidcode').val(v);
-        $('form').trigger("submit");
-      });
-    }, 10);
+  // 统一身份认证
+  if (window.location.host=="ids.tongji.edu.cn:8443") {
+    let isPwdFailed = $('#error').text().includes("密码错误");
+    if (!isPwdFailed) {
+      $('#username').val(items['username'] == null ? "" : items['username']);
+      $('#password').val(items['password'] == null ? "" : items['password']);
+      $('[name=btsubmit]').click().val(autoLoggingNotice)
+    }
   }
 
   if (window.location.host=="lib.tongji.edu.cn") {
-    if (window.location.href.indexOf("/loginvalidservice.aspx")>0) {//图书馆系统
+    // 图书馆系统
+    if (window.location.href.indexOf("/loginvalidservice.aspx")>0) {
       if ($('#Label_error').html()!='') return;
       $('#TextBox_name').val(items['username']==null?"":items['username']);
       $('#TextBox_pwd').val(items['password']==null?"":items['password']);
       $('#Button_ok').click();
-      $('body').html('<h1 align="center">Tongji Helper 正在为您自动登录…</h1>');
+      $('body').html(`<h1 align="center">${autoLoggingNotice}</h1>`);
     }
 
-    if (window.location.href.indexOf("/clientweb/xcus")>0 && $('span[class="acc_info_id"]').html()=="") {//研习室系统
+    // 研习室系统
+    if (window.location.href.indexOf("/clientweb/xcus")>0 && $('span[class="acc_info_id"]').html()=="") {
       $('span[class="glyphicon glyphicon-log-in"]').click();
       $('input[name=id]').val(items['username']==null?"":items['username']).hide();
       $('input[name=pwd]').val(items['password']==null?"":items['password']).hide();
-      $('input[value="登录"]').click().val('Tongji Helper 正在为您自动登录…').prop('disabled',true);
+      $('input[value="登录"]').click().val(autoLoggingNotice).prop('disabled',true);
     }
   }
 
-
-  if (window.location.host=="phylab.tongji.edu.cn" && (window.location.href.indexOf("index.action")>0 || window.location.href.indexOf("login.action")>0)) {//物理实验
+  // 物理实验
+  if (window.location.host=="phylab.tongji.edu.cn" && (window.location.href.indexOf("index.action")>0 || window.location.href.indexOf("login.action")>0)) {
     $('[name="loginForm.name"]').val(items['username']==null?"":items['username']).hide();
     $('[name="loginForm.password"]').val('1');//items['password']==null?"":items['password']).hide();
     $('[name=submitButton]').click();
-    $('body').html('<h1 align="center">Tongji Helper 正在为您自动登录…</h1>');
+    $('body').html(`<h1 align="center">${autoLoggingNotice}</h1>`);
   }
 
-  if (window.location.href=="http://itongjis.tongji.edu.cn/Home/Public/login") {//itongjis
+  // itongjis
+  if (window.location.href=="http://itongjis.tongji.edu.cn/Home/Public/login") {
     $('input.sub').click();
-    $('body').html('<h1 align="center">Tongji Helper 正在为您自动登录…</h1>');
+    $('body').html(`<h1 align="center">${autoLoggingNotice}</h1>`);
   }
 
-  if (window.location.host=="xuanke.tongji.edu.cn") {//辣鸡xuanke网
+  // 辣鸡 xuanke 网
+  if (window.location.host=="xuanke.tongji.edu.cn") {
     if ((window.location.pathname=="/" || window.location.pathname=="/index.jsp") && window.location.href.indexOf("?flag=5")<0) {
       window.location.href=$('a').prop('href');
     }
@@ -117,42 +110,15 @@ chrome.storage.local.get(['username','password','enable','interval','mail','mail
     }
   }
 
-  if (window.location.host=="4m3.tongji.edu.cn") {
-    $('head').append('<style>[data-title]:after{content:attr(data-title);position:absolute;text-align:left;transform:translate(10px);color:#fff;text-shadow:0 -1px 0px black;box-shadow:4px 4px 8px rgba(0,0,0,0.3);background:#383838;border-radius:2px;padding:3px 10px;font-size:12px;white-space:pre;transition:all.3s;opacity:0;visibility:hidden;}[data-title]:hover:after{transition-delay:100ms;visibility:visible;transform:translate(10px,-6px);opacity:1;}</style>');
-    if (window.location.href.indexOf("4m3.tongji.edu.cn/eams/tJStdElectCourse!defaultPage.action")>0) {
-      setInterval('checkandadd("tJ")',1500);
-      $('#teachClass>table>thead>tr').append('<th width="6%"><img src="https://qzs.qq.com/qzone/em/e248.gif" alt="斜眼笑"></th>');
-    }
-    if (window.location.href.indexOf("4m3.tongji.edu.cn/eams/sJStdElectCourse!defaultPage.action")>0) {
-      $('#notice').after('<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><ins class="adsbygoogle"     style="display:block"     data-ad-client="ca-pub-4798098153916731"     data-ad-slot="9000006805"     data-ad-format="auto"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script><p id="adtip" align="center"></p>');
-      setInterval('checkandadd("sJ")',1500);
-      $('#teachClass>table>thead>tr').append('<th width="6%"><img src="https://qzs.qq.com/qzone/em/e248.gif" alt="斜眼笑"></th>');
-    }
-    if (window.location.href.indexOf('courseTableForStd!courseTable.action')>0 && $('input[value=切换学期]').next().length==0) {
-      $('input[value=切换学期]').after('<a href="javascript:void(0);" style="margin-left:10px" onclick="javascript:$(\'#semesterCalendar_target\').val($(\'#semesterCalendar_target\').val()-1+2);$(\'input[value=切换学期]\').click();">下一学期</a>');
-      $('input[value=切换学期]').after('<a href="javascript:void(0);" style="margin-left:10px" onclick="javascript:$(\'#semesterCalendar_target\').val($(\'#semesterCalendar_target\').val()-1);$(\'input[value=切换学期]\').click();">上一学期</a>');
-    }
-    if (window.location.href=='http://4m3.tongji.edu.cn/eams/courseTableForStd!allTextBook.action') {
-      $('tbody tr>td:last-child').each(function(){$(this).html('<a href="http://webpac.lib.tongji.edu.cn/opac/openlink.php?isbn='+$(this).html()+'&series=&callno=&keyword=&year=&doctype=ALL&lang_code=ALL&displaypg=20&showmode=list&sort=CATA_DATE&orderby=desc&location=ALL&with_ebook=on" target="_blank">'+$(this).html()+'</a>');});
-      $('table').after('<p>Tip：单击书号可查看图书馆馆藏情况。——Tongji Helper</p>');
-    }
-  }
-
-  if ((window.location.href.includes('http://202.120.163.129:88/buyRecord') || window.location.href.includes('http://202.120.163.129:88/usedRecord'))&&items['setroom']) {
+  // 电费
+  if ((window.location.href.includes('http://202.120.163.129:88/buyRecord') || window.location.href.includes('http://202.120.163.129:88/usedRecord')) && items['setroom']) {
     let room=/<h6>.*?(\d*)\s*?剩余/.exec($('html').html())[1];
     chrome.storage.local.set({room:room,setroom:0});
     chrome.runtime.sendMessage({'target':'bg','action':'setRoomSucceed','room':room});
   }
 
-  if (window.location.host=='paycwc.tongji.edu.cn') {
-    if (window.location.pathname.indexOf('/payment/pay/payment.jsp')==0) {
-      $('table:first').remove();
-      $('form').css('height','100%');
-      $('#ext-gen13').css('overflow-y','auto');
-    }
-  }
-
-  if (window.location.href=="https://courses.tongji.edu.cn/sign-in") {//同济大学云课堂自动登录跳转
+  // 同济大学云课堂自动登录跳转
+  if (window.location.href=="https://courses.tongji.edu.cn/sign-in") {
     $(".login-btn").click();
   }
 
@@ -171,13 +137,15 @@ chrome.storage.local.get(['username','password','enable','interval','mail','mail
     $(window).scrollTop(0);
   }
 
-  if (window.location.href.indexOf('https://idp2.tongji.edu.cn/idp/profile/SAML2/Redirect/SSO')==0 && $('.form-error').length==0) {//CARSI教育网统一认证
+  // CARSI 教育网统一认证
+  if (window.location.href.indexOf('https://idp2.tongji.edu.cn/idp/profile/SAML2/Redirect/SSO')==0 && $('.form-error').length==0) {
     $('#username').val(items['username']==null?"":items['username']);
     $('#password').val(items['password']==null?"":items['password']);
     $('button[type="submit"]').click().prop('disabled',true);
   }
 
-  if (window.location.host=='xui.ptlogin2.qq.com' && window.location.href.indexOf('mail.qq.com')) {//qq邮箱自动登录
+  // QQ 邮箱自动登录
+  if (window.location.host=='xui.ptlogin2.qq.com' && window.location.href.indexOf('mail.qq.com')) {
     if (!items['mail'][items['mail_index']].mail.endsWith('@qq.com') && !items['mail'][items['mail_index']].mail.endsWith('@foxmail.com')) return;
     chrome.storage.local.set({mail_index:-1});
     $('#u').val(items['mail'][items['mail_index']].mail);
@@ -185,7 +153,8 @@ chrome.storage.local.get(['username','password','enable','interval','mail','mail
     $('#login_button').click();
   }
 
-  if (window.location.host=='dl.reg.163.com') {//163邮箱自动登录
+  // 163 邮箱自动登录
+  if (window.location.host=='dl.reg.163.com') {
     if (!items['mail'][items['mail_index']].mail.endsWith('@163.com')) return;
     chrome.storage.local.set({mail_index:-1});
     $('[name="email"]').val(items['mail'][items['mail_index']].mail);
@@ -197,7 +166,8 @@ chrome.storage.local.get(['username','password','enable','interval','mail','mail
     document.getElementsByName('password')[0].dispatchEvent(ev);");},500);
   }
 
-  if (window.location.host=='passport.126.com') {//126邮箱自动登录
+  // 126 邮箱自动登录
+  if (window.location.host=='passport.126.com') {
     if (!items['mail'][items['mail_index']].mail.endsWith('@126.com')) return;
     chrome.storage.local.set({mail_index:-1});
     $('[name="email"]').val(items['mail'][items['mail_index']].mail);
@@ -209,7 +179,8 @@ chrome.storage.local.get(['username','password','enable','interval','mail','mail
     document.getElementsByName('password')[0].dispatchEvent(ev);");},500);
   }
 
-  if (window.location.href=='https://mail.tongji.edu.cn/') {//同济邮箱自动登录
+  // 同济邮箱自动登录
+  if (window.location.href=='https://mail.tongji.edu.cn/') {
     if (!items['mail'][items['mail_index']].mail.endsWith('@tongji.edu.cn')) return;
     chrome.storage.local.set({mail_index:-1});
     $('#uid').val(items['mail'][items['mail_index']].mail);
@@ -217,13 +188,51 @@ chrome.storage.local.get(['username','password','enable','interval','mail','mail
     $('button.submit').click();
   }
 
-  if (window.location.host=='passport.alibaba.com' && window.location.href.indexOf('appName=yunmail')) {//阿里云邮箱自动登录
+  // 阿里云邮箱自动登录
+  if (window.location.host=='passport.alibaba.com' && window.location.href.indexOf('appName=yunmail')) {
     if (!items['mail'][items['mail_index']].mail.endsWith('@aliyun.com')) return;
     chrome.storage.local.set({mail_index:-1});
     $('#fm-login-id').val(items['mail'][items['mail_index']].mail);
     $('#fm-login-password').val(items['mail'][items['mail_index']].pswd);
     $('#fm-login-submit').click();
   }
+
+  // Service for 4m3 ended
+  // if (window.location.host=="4m3.tongji.edu.cn" && window.location.href.indexOf("electionP")>0) chrome.runtime.sendMessage({'target':'bg','sh':$('[id^="s"]').html()});
+  // if (window.location.host=="4m3.tongji.edu.cn") {
+  //   function checkandadd(typ) {
+  //     let old=false;
+  //     if ($('tr[class=red][id^=1111]').length>0) old=$('tr[class=red][id^=1111]').prop('id');
+  //     if ($('#teachClass>table>tbody>tr>td:last>a').html()=='辅助') return;
+  //     if (old) {
+  //       $('#teachClass>table>tbody>tr').each(function () {
+  //         $(this).append('<td><a href="http://4m3.tongji.edu.cn/eams/'+typ+'StdElectCourse!batchOperator.action?electLessonIds=&withdrawLessonIds=&exchangeLessonPairs='+$(this).prop('id')+'-'+old+'" onclick=\'alert("即将新建窗口用于辅助，请不要关闭新建的窗口，并请将电脑自动睡眠时间调为“从不”以防刷新停止！")\' target="_blank">辅助</a></td>');
+  //       });
+  //     } else {
+  //       $('#teachClass>table>tbody>tr').each(function () {
+  //         $(this).append('<td><a href="http://4m3.tongji.edu.cn/eams/'+typ+'StdElectCourse!batchOperator.action?electLessonIds='+$(this).prop('id')+'&withdrawLessonIds=&exchangeLessonPairs=" onclick=\'alert("即将新建窗口用于辅助，请不要关闭新建的窗口，并请将电脑自动睡眠时间调为“从不”以防刷新停止！")\' target="_blank">辅助</a></td>');
+  //       });
+  //     }
+  //   }
+  //   $('head').append('<style>[data-title]:after{content:attr(data-title);position:absolute;text-align:left;transform:translate(10px);color:#fff;text-shadow:0 -1px 0px black;box-shadow:4px 4px 8px rgba(0,0,0,0.3);background:#383838;border-radius:2px;padding:3px 10px;font-size:12px;white-space:pre;transition:all.3s;opacity:0;visibility:hidden;}[data-title]:hover:after{transition-delay:100ms;visibility:visible;transform:translate(10px,-6px);opacity:1;}</style>');
+  //   if (window.location.href.indexOf("4m3.tongji.edu.cn/eams/tJStdElectCourse!defaultPage.action")>0) {
+  //     setInterval('checkandadd("tJ")',1500);
+  //     $('#teachClass>table>thead>tr').append('<th width="6%"><img src="https://qzs.qq.com/qzone/em/e248.gif" alt="斜眼笑"></th>');
+  //   }
+  //   if (window.location.href.indexOf("4m3.tongji.edu.cn/eams/sJStdElectCourse!defaultPage.action")>0) {
+  //     $('#notice').after('<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><ins class="adsbygoogle"     style="display:block"     data-ad-client="ca-pub-4798098153916731"     data-ad-slot="9000006805"     data-ad-format="auto"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script><p id="adtip" align="center"></p>');
+  //     setInterval('checkandadd("sJ")',1500);
+  //     $('#teachClass>table>thead>tr').append('<th width="6%"><img src="https://qzs.qq.com/qzone/em/e248.gif" alt="斜眼笑"></th>');
+  //   }
+  //   if (window.location.href.indexOf('courseTableForStd!courseTable.action')>0 && $('input[value=切换学期]').next().length==0) {
+  //     $('input[value=切换学期]').after('<a href="javascript:void(0);" style="margin-left:10px" onclick="javascript:$(\'#semesterCalendar_target\').val($(\'#semesterCalendar_target\').val()-1+2);$(\'input[value=切换学期]\').click();">下一学期</a>');
+  //     $('input[value=切换学期]').after('<a href="javascript:void(0);" style="margin-left:10px" onclick="javascript:$(\'#semesterCalendar_target\').val($(\'#semesterCalendar_target\').val()-1);$(\'input[value=切换学期]\').click();">上一学期</a>');
+  //   }
+  //   if (window.location.href=='http://4m3.tongji.edu.cn/eams/courseTableForStd!allTextBook.action') {
+  //     $('tbody tr>td:last-child').each(function(){$(this).html('<a href="http://webpac.lib.tongji.edu.cn/opac/openlink.php?isbn='+$(this).html()+'&series=&callno=&keyword=&year=&doctype=ALL&lang_code=ALL&displaypg=20&showmode=list&sort=CATA_DATE&orderby=desc&location=ALL&with_ebook=on" target="_blank">'+$(this).html()+'</a>');});
+  //     $('table').after('<p>Tip：单击书号可查看图书馆馆藏情况。——Tongji Helper</p>');
+  //   }
+  // }
 });
 
 chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
@@ -246,7 +255,6 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
   }
   if (request.action=='refresh') window.location.reload();
   if (request.action=='addElectButton') {
-    if (!await getStorage('enable_elect',true)) return;
     attrname=Object.keys($('.el-col-13 .head').data())[0];
     $.ajax({url:request.url+'&c=1',type:'post',timeout:0,success:function (res) {
       if ($('.el-col-13 .head :last-child[ico]').length==0)
@@ -258,7 +266,7 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
       }
       $('button[courseid]').click(function(){
         if ($('#data-tr').length > 0) {
-          //  console.log("改课");
+          // console.log("改课");
           chrome.runtime.sendMessage({
             'target': 'bg',
             'action': 'addSup',
@@ -281,24 +289,3 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
 });
 
 if (window.location.host=="xuanke.tongji.edu.cn" && window.location.href.indexOf("o.jsp")>0) chrome.runtime.sendMessage({'target':'bg','sh':$('td[nowrap]').html()});
-if (window.location.host=="4m3.tongji.edu.cn" && window.location.href.indexOf("electionP")>0) chrome.runtime.sendMessage({'target':'bg','sh':$('[id^="s"]').html()});
-
-function refre() {
-  $('table').after('<h2 align="center" style="padding:50px">Tongji Helper 正在刷新…</h2>');
-  window.location.reload();
-}
-
-function checkandadd(typ) {
-  let old=false;
-  if ($('tr[class=red][id^=1111]').length>0) old=$('tr[class=red][id^=1111]').prop('id');
-  if ($('#teachClass>table>tbody>tr>td:last>a').html()=='辅助') return;
-  if (old) {
-    $('#teachClass>table>tbody>tr').each(function () {
-      $(this).append('<td><a href="http://4m3.tongji.edu.cn/eams/'+typ+'StdElectCourse!batchOperator.action?electLessonIds=&withdrawLessonIds=&exchangeLessonPairs='+$(this).prop('id')+'-'+old+'" onclick=\'alert("即将新建窗口用于辅助，请不要关闭新建的窗口，并请将电脑自动睡眠时间调为“从不”以防刷新停止！")\' target="_blank">辅助</a></td>');
-    });
-  } else {
-    $('#teachClass>table>tbody>tr').each(function () {
-      $(this).append('<td><a href="http://4m3.tongji.edu.cn/eams/'+typ+'StdElectCourse!batchOperator.action?electLessonIds='+$(this).prop('id')+'&withdrawLessonIds=&exchangeLessonPairs=" onclick=\'alert("即将新建窗口用于辅助，请不要关闭新建的窗口，并请将电脑自动睡眠时间调为“从不”以防刷新停止！")\' target="_blank">辅助</a></td>');
-    });
-  }
-}

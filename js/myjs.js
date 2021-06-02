@@ -105,4 +105,3 @@ Date.prototype.format = function(fmt) {
   return fmt;
 }
 let server="https://1.tongji.edu.cn";
-//let server="http://122.112.219.67:30669";
