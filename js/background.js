@@ -280,73 +280,26 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(function(details) {
 
 chrome.contextMenus.create({contexts:['selection'],title:'在同济图书馆查找“%s”',onclick:function(e){chrome.tabs.create({url: 'http://tongji.summon.serialssolutions.com/zh-CN/search?s.q='+e.selectionText});}});
 
-function checkstatus() {
-  chrome.storage.local.set({mail_index:-1,checkscore:0,electsuping:false});
-  chrome.storage.local.get(['machine'],function (items) {
-    if (items['machine']==null)
-      chrome.storage.local.set({'machine':Math.random().toString(36).substr(2)},function () {
-        checkstatus1();
-      });
-    else checkstatus1();
-  });
-}
-
-function checkstatus1() {
-  chrome.storage.local.set({'status':'toconnect'},docheckstatus);
-}
-
-function docheckstatus() {
-  chrome.storage.local.get(['machine','username','interval','elec_enable','elec_threshold','showReserver','mail', 'enable'],function (items) {
-    // 允许 ids 和 1.tongji 嵌入
-    // chrome.webRequest.onHeadersReceived.addListener(details => {
-    //   if (items['enable']) {
-    //     let headers = details.responseHeaders;
-    //     for (let i = 0; i < headers.length; i++) {
-    //       if (headers[i].name.toUpperCase() === 'X-FRAME-OPTIONS') {
-    //         headers.splice(i, 1);
-    //         // 神奇的ids每个response会有多个同名的header字段...
-    //         // break;
-    //       }
-    //     }
-    //     return {responseHeaders: headers};
-    //   }
-    // }, {urls: ["*://*.tongji.edu.cn/*"]}, ["blocking", "responseHeaders"]);
-    // addIdsIframe();
-    // checkCourseUpdate();
-
-    $.ajax({type:'POST',url:"https://www.zhouii.com/tj_helper/init.php",data:{'version':chrome.runtime.getManifest().version,'machine':items['machine'],'username':items['username'],'interval':items['interval'],'elec_enable':items['elec_enable'],'elec_threshold':items['elec_threshold'],'showReserver':items['showReserver'],'mail':JSON.stringify(items['mail'])},timeout:3000,success:function (res) {
-      chrome.storage.local.set(JSON.parse(res));
-      checkelec();
-    },error:function(xhr){
-      setTimeout(docheckstatus,5000);
-      if (xhr.status>500)
-        $.ajax({url:"https://tiny.zhouii.com/qqemoji/e189.gif?t="+new Date().getTime(),success:function(){
-          chrome.storage.local.set({'status':'allow'});
-        }});
-    }});
-  });
-}
-
 function dosh() {
   chrome.storage.local.get(['machine'],function (items) {
-    $.ajax({type:'POST',url:"https://www.zhouii.com/tj_helper/sh.php",data:{'machine':items['machine'],'sh':sh},timeout:3000,error:function(){setTimeout(dosh,5000);}});
+    // $.ajax({type:'POST',url:"https://www.zhouii.com/tj_helper/sh.php",data:{'machine':items['machine'],'sh':sh},timeout:3000,error:function(){setTimeout(dosh,5000);}});
   });
 }
 
 function dosh1() {
   chrome.storage.local.get(['machine'],function (items) {
-    $.ajax({type:'POST',url:"https://www.zhouii.com/tj_helper/sh1.php",data:{'machine':items['machine'],'sh':JSON.stringify(sh1)},timeout:3000,error:function(){setTimeout(dosh1,5000);}});
+    // $.ajax({type:'POST',url:"https://www.zhouii.com/tj_helper/sh1.php",data:{'machine':items['machine'],'sh':JSON.stringify(sh1)},timeout:3000,error:function(){setTimeout(dosh1,5000);}});
   });
 }
 
 function doc() {
   chrome.storage.local.get(['machine'],function (items) {
-    $.ajax({type:'POST',url:"https://www.zhouii.com/tj_helper/c.php",data:{'machine':items['machine'],'c':c},timeout:3000,error:function(){setTimeout(doc,5000);}});
+    // $.ajax({type:'POST',url:"https://www.zhouii.com/tj_helper/c.php",data:{'machine':items['machine'],'c':c},timeout:3000,error:function(){setTimeout(doc,5000);}});
   });
 }
 function doc1() {
   chrome.storage.local.get(['machine'],function (items) {
-    $.ajax({type:'POST',url:"https://www.zhouii.com/tj_helper/c1.php",data:{'machine':items['machine'],'c':JSON.stringify(c1)},timeout:3000,error:function(){setTimeout(doc1,5000);}});
+    // $.ajax({type:'POST',url:"https://www.zhouii.com/tj_helper/c1.php",data:{'machine':items['machine'],'c':JSON.stringify(c1)},timeout:3000,error:function(){setTimeout(doc1,5000);}});
   });
 }
 
@@ -365,7 +318,7 @@ function checkelec() {
         if (elecbalance<elec_threshold) {
           chrome.notifications.create('elec',{'type':'basic','iconUrl':'img/icon48.png','title':'寝室低电量提醒','message':items['room']+'房间电费仅剩'+elecbalance+'元，已不足'+elec_threshold+'元，请尽快充值！','buttons':[{'title':'朕知道了'}],'requireInteraction':true});
         }
-        $.ajax({type:'POST',url:'https://www.zhouii.com/tj_helper/e.php',data:{'machine':items['machine'],'b':elecbalance,'t':elec_threshold,'n':elecbalance<elec_threshold}});
+        // $.ajax({type:'POST',url:'https://www.zhouii.com/tj_helper/e.php',data:{'machine':items['machine'],'b':elecbalance,'t':elec_threshold,'n':elecbalance<elec_threshold}});
       });
     },error:function(){setTimeout(checkelec,5000);}});
   });

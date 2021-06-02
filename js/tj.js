@@ -131,13 +131,6 @@ chrome.storage.local.get(['username','password','enable','interval','status','ma
   }
 
   if (window.location.host=="4m3.tongji.edu.cn") {
-    if (window.location.href.indexOf("StdElectCourse!batchOperator.action")>0) {
-      if ($('html').html().indexOf('成功')>0) {
-        $('table').after('<iframe src="https://www.zhouii.com/tj_helper/elected.html" style="border: none;width: 100%;height: 800px;"></iframe>');
-        chrome.runtime.sendMessage({'target':'bg','action':'electSucceed','c':$('table').html()});
-      }
-      else setTimeout(refre,((items['interval']==null || items['interval']=='')?1500:items['interval']));
-    }
     $('head').append('<style>[data-title]:after{content:attr(data-title);position:absolute;text-align:left;transform:translate(10px);color:#fff;text-shadow:0 -1px 0px black;box-shadow:4px 4px 8px rgba(0,0,0,0.3);background:#383838;border-radius:2px;padding:3px 10px;font-size:12px;white-space:pre;transition:all.3s;opacity:0;visibility:hidden;}[data-title]:hover:after{transition-delay:100ms;visibility:visible;transform:translate(10px,-6px);opacity:1;}</style>');
     if (window.location.href.indexOf("4m3.tongji.edu.cn/eams/tJStdElectCourse!defaultPage.action")>0) {
       setInterval('checkandadd("tJ")',1500);
