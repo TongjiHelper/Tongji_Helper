@@ -27,8 +27,8 @@ async function getStorage(key,default_value){
 }
 
 function insertBS () {
-  $('head').append('<link href="'+chrome.runtime.getURL('css/bootstrap.min.css')+'" rel="stylesheet"><link href="'+chrome.runtime.getURL('css/mystyle.css')+'" rel="stylesheet"><script src="'+chrome.runtime.getURL('js/jquery-3.1.1.min.js')+'"></script>')
-  setTimeout(function(){$('head').append('<script src="'+chrome.runtime.getURL('js/bootstrap.min.js')+'"></script>')},100)
+  $('head').append('<link href="'+chrome.runtime.getURL('css/bootstrap.min.css')+'" rel="stylesheet"><link href="'+chrome.runtime.getURL('css/mystyle.css')+'" rel="stylesheet"><script src="'+chrome.runtime.getURL('lib/js/jquery-3.1.1.min.js')+'"></script>')
+  setTimeout(function(){$('head').append('<script src="'+chrome.runtime.getURL('lib/js/bootstrap.min.js')+'"></script>')},100)
 }
 
 function myeval(evalstr) {

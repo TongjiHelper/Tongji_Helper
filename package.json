@@ -1,0 +1,6 @@
+{
+  "name": "tongji-helper",
+  "devDependencies": {
+    "eslint": "^7.28.0"
+  }
+}

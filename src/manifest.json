@@ -27,7 +27,7 @@
         "*://202.120.163.129/*"
       ],
       "js": [
-        "js/jquery-3.1.1.min.js",
+        "lib/js/jquery-3.1.1.min.js",
         "js/myjs.js",
         "js/tj.js"
       ],
@@ -39,7 +39,7 @@
 
   "background": {
     "scripts": [
-      "js/jquery-3.1.1.min.js",
+      "lib/js/jquery-3.1.1.min.js",
       "js/myjs.js",
       "js/background.js"
     ]
@@ -63,10 +63,10 @@
   ],
 
   "web_accessible_resources": [
-    "css/bootstrap.min.css",
+    "lib/css/bootstrap.min.css",
     "css/mystyle.css",
-    "js/bootstrap.min.js",
-    "js/jquery-3.1.1.min.js",
+    "lib/js/bootstrap.min.js",
+    "lib/js/jquery-3.1.1.min.js",
     "fonts/*"
   ]
 }
