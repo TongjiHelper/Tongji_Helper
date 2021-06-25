@@ -174,7 +174,7 @@ function doElect () {
       dataType: 'json',
       timeout: 3000,
       success: function () {
-        setTimeout(checkElect, 200)
+        setTimeout(checkElect, 200, 500)
       },
       error: function (xhr) {
         onElectError(xhr, doElect)
@@ -184,50 +184,65 @@ function doElect () {
   updateElectPage()
 }
 
-function checkElect () {
+function checkElect (interval) {
+  if (!interval) {
+    interval = 500
+  }
   supstatus = 'e'
-  $.ajax({ url: server + '/api/electionservice/student/' + round + '/electRes', type: 'post', data: {}, dataType: 'json', timeout: 3000, success: async function (res) {
-    if (res.data.status != 'Ready') {
-      setTimeout(checkElect, 100)
-      return
-    }
-    c1 = []
-    for (success of res.data.successCourses) {
-      let isDeleted = false
-      for (id in sup) {
-        if (sup[id].delete.teachClassId === success) {
-          sup[id].delete.finish = 1
-          isDeleted = true
-        }
+  $.ajax({
+    url: server + '/api/electionservice/student/' + round + '/electRes',
+    type: 'post',
+    data: {},
+    dataType: 'json',
+    timeout: 3000,
+    success: function (res) {
+      if (res.data.status != 'Ready') {
+        setTimeout(checkElect, interval, (interval <= 300) ? 100 : interval / 2)
+        return
       }
-      if(!isDeleted) {
-        sup[success].finish = 1
-        c1.push(sup[success])
-      }
-    }
-    if (res.data.successCourses.length > 0) {
-      chrome.tabs.query({}, function (result) {
-        for (r in result) {
-          if (result[r].url != undefined && result[r].url.indexOf('//1.tongji.edu.cn/studentElect') > 0) {
-            chrome.tabs.sendMessage(result[r].id, { target: 'cs', action: 'refresh' })
-            chrome.tabs.sendMessage(result[r].id, { target: 'cs', action: 'refreshCourseTable' })
+      c1 = []
+      for (success of res.data.successCourses) {
+        let isDeleted = false
+        for (id in sup) {
+          if (sup[id].delete.teachClassId === success) {
+            sup[id].delete.finish = 1
+            isDeleted = true
           }
         }
-      })
-      doc1()
+        if(!isDeleted) {
+          sup[success].finish = 1
+          c1.push(sup[success])
+        }
+      }
+      if (res.data.successCourses.length > 0) {
+        chrome.tabs.query({}, function (result) {
+          for (r in result) {
+            if (result[r].url != undefined && result[r].url.indexOf('//1.tongji.edu.cn/studentElect') > 0) {
+              chrome.tabs.sendMessage(result[r].id, { target: 'cs', action: 'refresh' })
+              chrome.tabs.sendMessage(result[r].id, { target: 'cs', action: 'refreshCourseTable' })
+            }
+          }
+        })
+        doc1()
+      }
+      supfailmsg = res.data.failedReasons
+      if (isElectFinish()) {
+        supstatus = 'f'
+        chrome.storage.local.set({ electsuping: false })
+        chrome.power.releaseKeepAwake()
+        chrome.notifications.create('elect_finish', { type: 'basic', iconUrl: 'img/icon48.png', title: '辅助完成!', message: '所需辅助选课的课程已全部选课成功！', buttons: [{ title: '查看详情' }], requireInteraction: true })
+      } else {
+        supstatus = 'w'
+        getStorage('interval', 1500).then(interval => {
+          setTimeout(doElect, lastelect + interval - Date.now())
+        })
+      }
+      updateElectPage()
+    },
+    error: function (xhr) {
+      onElectError(xhr, checkElect.bind(null, 500))
     }
-    supfailmsg = res.data.failedReasons
-    if (isElectFinish()) {
-      supstatus = 'f'
-      chrome.storage.local.set({ electsuping: false })
-      chrome.power.releaseKeepAwake()
-      chrome.notifications.create('elect_finish', { type: 'basic', iconUrl: 'img/icon48.png', title: '辅助完成!', message: '所需辅助选课的课程已全部选课成功！', buttons: [{ title: '查看详情' }], requireInteraction: true })
-    } else {
-      supstatus = 'w'
-      setTimeout(doElect, lastelect + await getStorage('interval', 1500) - Date.now())
-    }
-    updateElectPage()
-  }, error: function (xhr) {onElectError(xhr, checkElect)} })
+  })
   updateElectPage()
 }
 

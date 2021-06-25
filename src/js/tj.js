@@ -303,7 +303,3 @@ chrome.runtime.onMessage.addListener(async function (request) {
   if (request.action == 'refreshCourseTable')
     myeval('vueApp.$children[0].$children[0].$children[2].$children[1].$children[0].$children[0].$children[0].getData()')
 })
-
-if (window.location.host == "xuanke.tongji.edu.cn" && window.location.href.indexOf("o.jsp") > 0) {
-  chrome.runtime.sendMessage({ target: 'bg', sh: $('td[nowrap]').html() })
-}

@@ -49,14 +49,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"Tongji-Helper@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "Tongji-Helper@workspace:."
-  dependencies:
-    eslint: ^7.28.0
-  languageName: unknown
-  linkType: soft
-
 "acorn-jsx@npm:^5.3.1":
   version: 5.3.1
   resolution: "acorn-jsx@npm:5.3.1"
@@ -932,6 +924,14 @@ __metadata:
   checksum: 373904ce70524ba11ec7e1905c44fb92671132d5e0b0aba2fb48057161f8bf9cbf7f6178f0adf31810150cf44fb52c7b912dc722bff3fddf9688378596dbeb56
   languageName: node
   linkType: hard
+
+"tongji-helper@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "tongji-helper@workspace:."
+  dependencies:
+    eslint: ^7.28.0
+  languageName: unknown
+  linkType: soft
 
 "type-check@npm:^0.4.0, type-check@npm:~0.4.0":
   version: 0.4.0
