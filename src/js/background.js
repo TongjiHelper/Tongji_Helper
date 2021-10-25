@@ -28,11 +28,6 @@ chrome.webRequest.onBeforeRequest.addListener(
   ["blocking"])
 
 chrome.webRequest.onBeforeRequest.addListener(
-  function () { return { redirectUrl: "http://cwc.tongji.edu.cn/WFManager/home2.jsp" } },
-  { urls: ["http://cwc.tongji.edu.cn/WFManager/login.jsp"] },
-  ["blocking"])
-
-chrome.webRequest.onBeforeRequest.addListener(
   function (details) {
     if (details.method == 'POST' && details.requestBody.formData.radio != null) {
       let request = details.requestBody.formData
